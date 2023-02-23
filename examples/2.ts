@@ -1,0 +1,11 @@
+
+
+class SecondClass {
+    myFirstMethod() {
+
+    }
+
+    mySecondMethod() {
+        
+    }
+}

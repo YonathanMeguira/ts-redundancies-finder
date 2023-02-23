@@ -5,4 +5,3 @@ Find redundant methods in folders. works with TS files
 
 #### How to use: cd to folder > node index.js
 
-##### Property of Yonathan Meguira

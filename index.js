@@ -1,49 +1,29 @@
-const fs = require('fs');
-const ts = require('typescript');
+const  { findRedundancies } = require("./lib/find-code-redundancies");
+const { explainCode } = require('./lib/explain-code');
 
-const prefix = './examples';
+// findRedundancies('./examples');
 
-function read() {
-  fs.readdirSync(prefix).forEach(file => {
-    if (file.includes('ts')) {
-      extractFunctionsFromFile(`${prefix}/${file}`);
-      console.log('here comes the map');
-      console.log(map);
-    } else {
-      throw 'Not a valid file'
+
+const badCode = `
+function buildTree(data, isChild = false) {
+  let html = '<ul>'
+  data.forEach(element => {
+    html += "coucou"
+    // If te current data element
+    // has children then call the 
+    // buildTree again passing in
+    // the children and isChild = true
+    if(d.children) {
+      html += buildTree(d.children, true)
     }
   });
+  html += '</ul>'
+  return html
 }
 
-let map = {};
+let uls = buildTree(data);
+console.log(uls);
 
+"""`;
 
-function extractFunctionsFromFile(fileName) {
-  const program = ts.createProgram([fileName], {});
-  const sourceFile = program.getSourceFile(fileName);
-
-  function walk(node) {
-    if (ts.isClassDeclaration(node)) {
-      const className = node.name.escapedText;
-      node.members.forEach(member => {
-        if (ts.isMethodDeclaration(member)) {
-          const methodName = member.name.escapedText;
-          map[methodName] = map[methodName] ? [...map[methodName], className] : [className];
-        }
-      });
-    }
-    ts.forEachChild(node, walk);
-  }
-
-  walk(sourceFile);
-}
-
-
-function findDoubles() {
-  const doubles = Object.keys(map).filter(key => map[key].length > 1);
-  console.log(`Here are the Doubles: ${doubles}`);
-}
-
-
-read();
-findDoubles();
+explainCode(badCode);

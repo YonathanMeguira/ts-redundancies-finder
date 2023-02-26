@@ -4,26 +4,40 @@ const { explainCode } = require('./lib/explain-code');
 // findRedundancies('./examples');
 
 
-const badCode = `
-function buildTree(data, isChild = false) {
-  let html = '<ul>'
-  data.forEach(element => {
-    html += "coucou"
-    // If te current data element
-    // has children then call the 
-    // buildTree again passing in
-    // the children and isChild = true
-    if(d.children) {
-      html += buildTree(d.children, true)
+const code = `
+function read(folder) {
+  fs.readdirSync(folder).forEach(file => {
+    if (file.includes('ts')) {
+      extractFunctionsFromFile('folder');
+      console.log(map);
+    } else {
+      throw 'Not a valid file'
     }
   });
-  html += '</ul>'
-  return html
 }
 
-let uls = buildTree(data);
-console.log(uls);
+
+
+function extractFunctionsFromFile(fileName) {
+  const program = ts.createProgram([fileName], {});
+  const sourceFile = program.getSourceFile(fileName);
+
+  function walk(node) {
+    if (ts.isClassDeclaration(node)) {
+      const className = node.name.escapedText;
+      node.members.forEach(member => {
+        if (ts.isMethodDeclaration(member)) {
+          const methodName = member.name.escapedText;
+          map[methodName] = map[methodName] ? [...map[methodName], className] : [className];
+        }
+      });
+    }
+    ts.forEachChild(node, walk);
+  }
+
+  walk(sourceFile);
+}
 
 """`;
 
-explainCode(badCode);
+explainCode(code);
